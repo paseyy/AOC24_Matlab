@@ -1,0 +1,47 @@
+function [new_map, new_pos, new_dir] = make_move(map, pos, dir)
+    new_pos = pos + dir;    
+    
+    switch map(new_pos(1), new_pos(2))
+        case '.'
+        case 'X'
+            map(pos) = 'X';
+            new_dir = dir;
+        case '#'
+            % obstacle hit, don't move
+            new_pos = pos;
+            map(pos) = '^';
+            % turn 90 degrees for the new direction
+            switch dir
+                case [1, 0]
+                    new_dir = [0, -1];
+                case [0, -1]
+                    new_dir = [-1, 0];
+                case [-1, 0]
+                    new_dir = [0, 1];
+                case [0, 1]
+                    new_dir = [1, 0];
+            end
+        otherwise
+            disp("Error:" + map(new_pos));
+    end
+
+    new_map = map;
+end
+
+temp = regexp(fileread('test.txt'), '\r?\n', 'split');
+Map = vertcat(temp{:});
+
+[row, col] = find(Map == '^');
+position = [row, col];
+direction = [-1, 0];
+
+running = true;
+while running
+    [Map, position, direction] = make_move(Map, position, direction);
+    Map
+    if any(position < 1 | position > size(map, 1))
+        running = false;
+    end
+end
+
+count = sum(find(Map == 'X'))
